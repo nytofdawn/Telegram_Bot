@@ -23,13 +23,13 @@ async function saveToNotion(message) {
   }
 
   await notion.pages.update({
-    page_id: latestPage.id,
-    properties: {
-      Message: {
-        rich_text: [{ text: { content: message } }],
-      },
+  page_id: latestPage.id,
+  properties: {
+    'Peso Saved': {
+      number: Number(message), // converts the message text to a number
     },
-  });
+  },
+});
 
   console.log(`✅ Updated latest page with: "${message}"`);
 }
