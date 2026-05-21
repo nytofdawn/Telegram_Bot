@@ -1,6 +1,5 @@
 const express = require('express');
 const { Client } = require('@notionhq/client');
-const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 const app = express();
 app.use(express.json());
@@ -10,11 +9,10 @@ const NOTION_DB_ID = process.env.NOTION_DB_ID;
 const MY_TELEGRAM_ID = '7834118306';
 
 async function saveToNotion(message) {
-  // Step 1 — Find the latest created page with empty Message
   const response = await notion.databases.query({
     database_id: NOTION_DB_ID,
     sorts: [{ timestamp: 'created_time', direction: 'descending' }],
-    page_size: 1, // get only the latest
+    page_size: 1,
   });
 
   const latestPage = response.results[0];
@@ -24,7 +22,6 @@ async function saveToNotion(message) {
     return;
   }
 
-  // Step 2 — Update the Message field of that page
   await notion.pages.update({
     page_id: latestPage.id,
     properties: {
@@ -47,7 +44,6 @@ app.post('/webhook', async (req, res) => {
   if (senderId !== MY_TELEGRAM_ID) return res.sendStatus(200);
 
   await saveToNotion(message.text);
-  console.log(`✅ Saved: "${message.text}"`);
 
   res.sendStatus(200);
 });
