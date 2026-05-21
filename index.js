@@ -1,5 +1,6 @@
 const express = require('express');
 const { Client } = require('@notionhq/client');
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 const app = express();
 app.use(express.json());
