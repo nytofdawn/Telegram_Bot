@@ -9,8 +9,7 @@ const NOTION_DB_ID = process.env.NOTION_DB_ID;
 const MY_TELEGRAM_ID = '7834118306';
 
 async function saveToNotion(message) {
-  // ✅ New API in v5
-  const response = await notion.databases.queryPage({
+  const response = await notion.databases.query({
     database_id: NOTION_DB_ID,
     sorts: [{ timestamp: 'created_time', direction: 'descending' }],
     page_size: 1,
