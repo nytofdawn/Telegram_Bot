@@ -9,14 +9,31 @@ const NOTION_DB_ID = process.env.NOTION_DB_ID;
 const MY_TELEGRAM_ID = '7834118306';
 
 async function saveToNotion(message) {
-  await notion.pages.create({
-    parent: { database_id: NOTION_DB_ID },
+  // Step 1 — Find the latest created page with empty Message
+  const response = await notion.databases.query({
+    database_id: NOTION_DB_ID,
+    sorts: [{ timestamp: 'created_time', direction: 'descending' }],
+    page_size: 1, // get only the latest
+  });
+
+  const latestPage = response.results[0];
+
+  if (!latestPage) {
+    console.log('❌ No page found in Notion DB');
+    return;
+  }
+
+  // Step 2 — Update the Message field of that page
+  await notion.pages.update({
+    page_id: latestPage.id,
     properties: {
       Message: {
-        title: [{ text: { content: message } }],
+        rich_text: [{ text: { content: message } }],
       },
     },
   });
+
+  console.log(`✅ Updated latest page with: "${message}"`);
 }
 
 app.post('/webhook', async (req, res) => {
