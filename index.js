@@ -9,7 +9,8 @@ const NOTION_DB_ID = process.env.NOTION_DB_ID;
 const MY_TELEGRAM_ID = '7834118306';
 
 async function saveToNotion(message) {
-  const response = await notion.databases.query({
+  // ✅ New API in v5
+  const response = await notion.databases.queryPage({
     database_id: NOTION_DB_ID,
     sorts: [{ timestamp: 'created_time', direction: 'descending' }],
     page_size: 1,
@@ -43,7 +44,11 @@ app.post('/webhook', async (req, res) => {
 
   if (senderId !== MY_TELEGRAM_ID) return res.sendStatus(200);
 
-  await saveToNotion(message.text);
+  try {
+    await saveToNotion(message.text);
+  } catch (err) {
+    console.error('❌ Notion error:', err.message);
+  }
 
   res.sendStatus(200);
 });
